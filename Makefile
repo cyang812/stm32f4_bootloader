@@ -79,6 +79,9 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
+Drivers/Bsp/Src/stm32469i_discovery.c \
+Drivers/Bsp/Src/stm32469i_discovery_eeprom.c \
+Drivers/Bsp/Src/stm32469i_discovery_sdram.c \
 Core/Src/system_stm32f4xx.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
@@ -157,8 +160,8 @@ C_INCLUDES =  \
 -IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc \
 -IMiddlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
--IDrivers/CMSIS/Include
-
+-IDrivers/CMSIS/Include \
+-IDrivers/Bsp/Inc
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

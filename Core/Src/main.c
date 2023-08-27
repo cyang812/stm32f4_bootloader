@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32469i_discovery.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -155,7 +155,10 @@ int main(void)
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
-    
+    BSP_LED_On(LED1);
+    HAL_Delay(1000);
+    BSP_LED_Off(LED1);
+    HAL_Delay(1000);
 
     /* USER CODE BEGIN 3 */
   }
