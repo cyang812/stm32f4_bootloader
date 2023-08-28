@@ -1,8 +1,6 @@
 name: Push/PR CI
 
 on:
-  push:
-    branches: [ "feature/*" ]
   pull_request:
     branches: [ "master" ]
 
