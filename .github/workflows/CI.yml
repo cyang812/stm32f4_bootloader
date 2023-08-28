@@ -61,7 +61,7 @@ jobs:
       id: assemble-release-check
       run: |
         echo "Release:"
-        ls -R /home/runner/work/stm32f4_bootloader/build
+        ls -R /home/runner/work/stm32f4_bootloader/stm32f4_bootloader/build
         echo "Runner:"
         ls -R /home/runner/
 
