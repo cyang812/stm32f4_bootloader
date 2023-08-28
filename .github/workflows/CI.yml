@@ -1,0 +1,77 @@
+name: Push/PR CI
+
+on:
+  push:
+    branches: [ "feature/*" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Declare some variables
+      shell: bash
+      run: |
+        echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+        echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
+
+    - name: Run find-and-replace to remove /
+      uses: mad9000/actions-find-and-replace-string@3
+      id: findandreplace
+      with:
+        source: ${{ env.branch }}
+        find: '/'
+        replace: '-'
+
+    - name: Verify variables
+      run: |
+        echo "original branch: ${{ env.branch }}"
+        echo "processed branch: ${{ steps.findandreplace.outputs.value }}"
+        echo "Sha: ${{ env.sha_short }}"
+        echo "release_version=$(echo ${{ steps.findandreplace.outputs.value }}-${{ env.sha_short }})" >> "$GITHUB_ENV"
+
+    - name: Release Version
+      run: |
+        echo "Release Version: ${{ env.release_version }}"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.release_version }}
+        release_name: ${{ env.release_version }}
+        body: |
+          Create by action when push code
+        draft: false
+        prerelease: false
+
+    - name: arm-none-eabi-gcc GNU Arm Embedded Toolchain
+      uses: carlosperate/arm-none-eabi-gcc-action@v1.7.1
+
+    - name: make
+      run: make
+
+    - name: sanity-check
+      id: assemble-release-check
+      run: |
+        echo "Release:"
+        ls -R /home/runner/work/stm32f4_bootloader/build
+        echo "Runner:"
+        ls -R /home/runner/
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/stm32f4_bootloader.bin
+        asset_name: stm32f4_bootloader.bin
+        asset_content_type: application/bin
