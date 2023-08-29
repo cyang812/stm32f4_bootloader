@@ -15,7 +15,7 @@ jobs:
       shell: bash
       run: |
         echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
-        echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
+        echo "branch=$(echo ${{ github.event.pull_request.base.ref }} )" >> "$GITHUB_ENV"
 
     - name: Run find-and-replace to remove /
       uses: mad9000/actions-find-and-replace-string@3
