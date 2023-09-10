@@ -40,6 +40,10 @@ Core/Src/main.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Core/Src/stm32f4xx_hal_timebase_tim.c \
+Core/Src/common.c \
+Core/Src/flash_if.c \
+Core/Src/menu.c \
+Core/Src/ymodem.c \
 FATFS/Target/bsp_driver_sd.c \
 FATFS/Target/sd_diskio.c \
 FATFS/Target/fatfs_platform.c \

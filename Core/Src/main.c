@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32469i_discovery.h"
+#include "menu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,7 +34,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#pragma import(__use_no_semihosting)
 
+#ifdef __GNUC__
+  /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,7 +76,12 @@ UART_HandleTypeDef huart6;
 SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
+const char* FW_VERSION = "V1.0";
+const char* COMPILE_DATA = __DATE__;
+const char* COMPILE_TIME = __TIME__;
 
+extern pFunction JumpToApplication;
+extern uint32_t JumpAddress;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -146,6 +160,39 @@ int main(void)
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 
+  printf("\n\nIAP Bootloader start\n\n");
+  printf("[Image: version:%s %s %s cyang812]\n", FW_VERSION, COMPILE_DATA, COMPILE_TIME);
+
+  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
+
+  /* Test if Key push-button on STM324xG-EVAL Board is pressed */
+  if (BSP_PB_GetState(BUTTON_USER) == 0x01)
+  {
+    /* Unlock the Flash Program Erase controller */
+    FLASH_If_Init();
+
+    /* Display main menu */
+    Main_Menu ();
+  }
+  /* Keep the user application running */
+  else
+  {
+    /* Test if user code is programmed starting from address "APPLICATION_ADDRESS" */
+    if (((*(__IO uint32_t*)USER_START_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    {
+      /* Jump to user application */
+      JumpAddress = *(__IO uint32_t*) (USER_START_ADDRESS + 4);
+      JumpToApplication = (pFunction) JumpAddress;
+      /* Initialize user application's Stack Pointer */
+      __set_MSP(*(__IO uint32_t*) USER_START_ADDRESS);
+      JumpToApplication();
+    }
+    else
+    {
+      printf("Jump to the user App failed.\n");
+    }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -153,7 +200,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
+    //MX_USB_HOST_Process();
 
     BSP_LED_On(LED1);
     HAL_Delay(1000);
@@ -951,7 +998,28 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 0xFFFF); 
+  return ch;
+}
 
+int _write(int fd, char *pBuffer, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        __io_putchar(*pBuffer++);
+    }
+    return size;
+}
+
+/*定义_sys_exit()以避免使用半主机模式*/
+void _sys_exit(int x)
+{
+    x = x;
+}
 /* USER CODE END 4 */
 
 /**

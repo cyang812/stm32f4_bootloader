@@ -308,6 +308,8 @@ typedef enum
 #define DISCO_I2C2_EV_IRQn                     I2C2_EV_IRQn
 #define DISCO_I2C2_ER_IRQn                     I2C2_ER_IRQn
 
+#define USE_STM32469I_DISCO_REVB
+
 #if !defined(USE_STM32469I_DISCO_REVA) && \
     !defined(USE_STM32469I_DISCO_REVB) && \
     !defined(USE_STM32469I_DISCO_REVC)
