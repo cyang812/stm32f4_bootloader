@@ -178,7 +178,8 @@ int main(void)
   else
   {
     /* Test if user code is programmed starting from address "APPLICATION_ADDRESS" */
-    if (((*(__IO uint32_t*)USER_START_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    uint32_t temp = ((*(__IO uint32_t*)USER_START_ADDRESS) & 0x2FF80000 );
+    if (temp == 0x20000000)
     {
       /* Jump to user application */
       JumpAddress = *(__IO uint32_t*) (USER_START_ADDRESS + 4);
@@ -189,7 +190,7 @@ int main(void)
     }
     else
     {
-      printf("Jump to the user App failed.\n");
+      printf("Jump to the user App failed, temp = %x\n", temp);
     }
   }
 
